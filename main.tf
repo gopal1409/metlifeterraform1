@@ -29,3 +29,24 @@ resource "azurerm_subnet" "myterraformsubnet" {
     address_prefixes = ["1.0.2.0/24"]
 
 }
+#to access resource across internet outside azure cloud to do the same we need to create an public ip
+resource "azurerm_public_ip" "myterraformpublicip" {
+    name = "myPublicIp"
+    location = "eastus"
+    resource_group_name = azurerm_resource_group.myterraform.name
+    allocation_method = "Dynamic"
+    tags = {
+        environment = "Terraform Metlife"
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
