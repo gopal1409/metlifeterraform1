@@ -84,7 +84,24 @@ resource "azurerm_network_security_group" "myterraformnsg"{
         network_interface_id = azurerm_network_interface.myterraformnic.id
         network_security_group_id = azurerm_network_security_group.myterraformnsg.id 
     }
+resource "random_id" "randomid" {
+    keepers = {
+        #generate new id only when a new resource group is defined"
+        resource_group_name = azurerm_resource_group.myterraform.name
+    }
+    byte_length = 8
+}
 
+resource "azurerm_storage_account" "mystorageaccount" {
+    name = "diag${random_id.randomid.hex}"
+    location = "eastus"
+    resource_group_name = azurerm_resource_group.myterraform.name
+    account_replication_type = "LRS"
+    account_tier = "Standard"
+    tags = {
+        environment = "Terraform Metlife"
+    }
+}
 
 
 
