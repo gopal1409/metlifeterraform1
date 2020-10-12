@@ -2,11 +2,10 @@ provider "azurerm" {
     version = "~>2.0"
     features {}
 }
-
 # we will create a resource group
 resource "azurerm_resource_group" "myterraform" {
-    name = "myResourceGroup"
-    location = "eastus"
+    name = var.web_server_rg
+    location = var.web_server_location
     tags = {
         environment = "Terraform Metlife"
     }
@@ -15,7 +14,7 @@ resource "azurerm_resource_group" "myterraform" {
 resource "azurerm_virtual_network" "myterraformnetwork" {
     name = "mvVnet"
     address_space = ["1.0.0.0/16"]
-    location = "eastus"
+    location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     tags = {
         environment = "Terraform Metlife"
@@ -32,7 +31,7 @@ resource "azurerm_subnet" "myterraformsubnet" {
 #to access resource across internet outside azure cloud to do the same we need to create an public ip
 resource "azurerm_public_ip" "myterraformpublicip" {
     name = "myPublicIp"
-    location = "eastus"
+    location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     allocation_method = "Dynamic"
     tags = {
@@ -45,7 +44,7 @@ resource "azurerm_public_ip" "myterraformpublicip" {
 
 resource "azurerm_network_security_group" "myterraformnsg"{
     name = "myNetworkSecurityGroup"
-    location = "eastus"
+    location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     security_rule {
         name = "SSH"
@@ -65,7 +64,7 @@ resource "azurerm_network_security_group" "myterraformnsg"{
 }
  resource "azurerm_network_interface" "myterraformnic" {
      name = "myNic"
-     location = "eastus"
+     location = var.web_server_location
      resource_group_name = azurerm_resource_group.myterraform.name
 
     ip_configuration {
@@ -94,7 +93,7 @@ resource "random_id" "randomid" {
 
 resource "azurerm_storage_account" "mystorageaccount" {
     name = "diag${random_id.randomid.hex}"
-    location = "eastus"
+    location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     account_replication_type = "LRS"
     account_tier = "Standard"
@@ -112,7 +111,7 @@ output "tls_private_key" { value = tls_private_key.example_ssh.private_key_pem }
 
 resource "azurerm_linux_virtual_machine" "myterraformvm"{
     name = "myVM"
-    location = "eastus"
+    location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     network_interface_ids = [azurerm_network_interface.myterraformnic.id]
     size = "Standard_DS1_V2"
@@ -131,7 +130,7 @@ resource "azurerm_linux_virtual_machine" "myterraformvm"{
 
     computer_name = "myvm"
     admin_username = "gopal"
-    disable_password_authentication = true
+    admin_password = "Pass@123456"
 
     admin_ssh_key {
         username = "gopal"
