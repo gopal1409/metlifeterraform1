@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "myterraform" {
 }
 # creating a virtual network 
 resource "azurerm_virtual_network" "myterraformnetwork" {
-    name = "mvVnet"
+    name = "${var.resource_prefix}-vnet"
     address_space = ["1.0.0.0/16"]
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "myterraformnetwork" {
 }
 
 resource "azurerm_subnet" "myterraformsubnet" {
-    name = "mysubnet"
+    name = "${var.resource_prefix}-subnet"
     resource_group_name = azurerm_resource_group.myterraform.name
     virtual_network_name = azurerm_virtual_network.myterraformnetwork.name
     address_prefixes = ["1.0.2.0/24"]
@@ -30,7 +30,7 @@ resource "azurerm_subnet" "myterraformsubnet" {
 }
 #to access resource across internet outside azure cloud to do the same we need to create an public ip
 resource "azurerm_public_ip" "myterraformpublicip" {
-    name = "myPublicIp"
+    name = "${var.resource_prefix}-publicip"
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     allocation_method = "Dynamic"
@@ -43,7 +43,7 @@ resource "azurerm_public_ip" "myterraformpublicip" {
 #network security group control the flow of network traffice in and out of your virtual_network_name
 
 resource "azurerm_network_security_group" "myterraformnsg"{
-    name = "myNetworkSecurityGroup"
+    name = "${var.resource_prefix}-sg"
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     security_rule {
@@ -63,12 +63,12 @@ resource "azurerm_network_security_group" "myterraformnsg"{
 
 }
  resource "azurerm_network_interface" "myterraformnic" {
-     name = "myNic"
+     name = "${var.resource_prefix}-nic"
      location = var.web_server_location
      resource_group_name = azurerm_resource_group.myterraform.name
 
     ip_configuration {
-        name = "mynicconfiguration"
+        name = "${var.resource_prefix}-ip"
         subnet_id = azurerm_subnet.myterraformsubnet.id
         private_ip_address_allocation = "Dynamic"
         public_ip_address_id = azurerm_public_ip.myterraformpublicip.id
@@ -110,14 +110,14 @@ resource "tls_private_key" "example_ssh" {
 output "tls_private_key" { value = tls_private_key.example_ssh.private_key_pem }
 
 resource "azurerm_linux_virtual_machine" "myterraformvm"{
-    name = "myVM"
+    name = "${var.resource_prefix}-vm"
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     network_interface_ids = [azurerm_network_interface.myterraformnic.id]
     size = "Standard_DS1_V2"
 
     os_disk {
-        name = "myOSDisk"
+        name = "${var.resource_prefix}-disk"
         caching = "ReadWrite"
         storage_account_type = "Premium_LRS"
     }
