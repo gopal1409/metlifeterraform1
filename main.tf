@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "myterraform" {
 # creating a virtual network 
 resource "azurerm_virtual_network" "myterraformnetwork" {
     name = "${var.resource_prefix}-vnet"
-    address_space = ["1.0.0.0/16"]
+    address_space = [var.web_server_address_space]
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     tags = {
@@ -25,7 +25,7 @@ resource "azurerm_subnet" "myterraformsubnet" {
     name = "${var.resource_prefix}-subnet"
     resource_group_name = azurerm_resource_group.myterraform.name
     virtual_network_name = azurerm_virtual_network.myterraformnetwork.name
-    address_prefixes = ["1.0.2.0/24"]
+    address_prefixes = [var.web_server_address_prefix]
 
 }
 #to access resource across internet outside azure cloud to do the same we need to create an public ip
