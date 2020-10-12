@@ -47,13 +47,13 @@ resource "azurerm_network_security_group" "myterraformnsg"{
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     security_rule {
-        name = "SSH"
+        name = "RDP"
         priority = 1001
         direction = "Inbound"
         access = "Allow"
         protocol = "TCP"
         source_port_range = "*"
-        destination_port_range = "22"
+        destination_port_range = "3389"
         source_address_prefix = "*"
         destination_address_prefix = "*"
     }
@@ -102,61 +102,30 @@ resource "azurerm_storage_account" "mystorageaccount" {
     }
 }
 
-resource "tls_private_key" "example_ssh" {
-    algorithm = "RSA"
-    rsa_bits = 4096
-}
 
-output "tls_private_key" { value = tls_private_key.example_ssh.private_key_pem }
 
-resource "azurerm_linux_virtual_machine" "myterraformvm"{
-    name = "${var.resource_prefix}-vm"
-    location = var.web_server_location
-    resource_group_name = azurerm_resource_group.myterraform.name
-    network_interface_ids = [azurerm_network_interface.myterraformnic.id]
-    size = "Standard_DS1_V2"
+resource "azurerm_windows_virtual_machine" "example" {
+  name = "${var.resource_prefix}-winvm"
+  location = var.web_server_location
+  resource_group_name = azurerm_resource_group.myterraform.name
+  network_interface_ids = [azurerm_network_interface.myterraformnic.id]
+  size                = "Standard_DS1_V2"
+  admin_username      = "gopal"
+  admin_password      = "Hetal@123456"
+  
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-    os_disk {
-        name = "${var.resource_prefix}-disk"
-        caching = "ReadWrite"
-        storage_account_type = "Premium_LRS"
-    }
-    source_image_reference {
-        publisher = "Canonical"
-        offer = "UbuntuServer"
-        sku = "18.04-LTS"
-        version = "latest"
-    }
-
-    computer_name = "myvm"
-    admin_username = "gopal"
-    admin_password = "Pass@123456"
-
-    admin_ssh_key {
-        username = "gopal"
-        public_key = tls_private_key.example_ssh.public_key_openssh
-    }
-    boot_diagnostics {
-        storage_account_uri = azurerm_storage_account.mystorageaccount.primary_blob_endpoint
-    }
-    tags = {
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+      tags = {
         environment = "Terraform Metlife"
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
