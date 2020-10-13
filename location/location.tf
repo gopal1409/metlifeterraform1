@@ -108,13 +108,11 @@ resource "azurerm_windows_virtual_machine" "example" {
   size                = "Standard_DS1_V2"
   admin_username      = "gopal"
   admin_password      = var.admin_password
-  
-  os_disk {
+    os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
-  source_image_reference {
+   source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
     sku       = "2016-Datacenter"
@@ -124,4 +122,18 @@ resource "azurerm_windows_virtual_machine" "example" {
         environment = "Terraform Metlife"
     }
 
+}
+resource "azurerm_virtual_machine_extension" "example" {
+    name                 = "${var.resource_prefix}-host"
+    virtual_machine_id   = azurerm_windows_virtual_machine.example.id
+    publisher            = "Microsoft.Compute"
+    type                 = "CustomScriptExtension"
+    type_handler_version = "1.10"
+
+    settings = <<SETTINGS
+    {
+      "fileUris": ["https://raw.githubusercontent.com/eltimmo/learning/master/azureInstallWebServer.ps1"],
+      "commandToExecute": "start powershell -ExecutionPolicy Unrestricted -File azureInstallWebServer.ps1"
+    }
+    SETTINGS
 }
