@@ -107,7 +107,7 @@ resource "azurerm_windows_virtual_machine" "example" {
   network_interface_ids = [azurerm_network_interface.myterraformnic.id]
   size                = "Standard_DS1_V2"
   admin_username      = "gopal"
-  admin_password      = data.azurerm_key_vault_secret.admin_password.value
+  admin_password      = var.admin_password
   
   os_disk {
     caching              = "ReadWrite"

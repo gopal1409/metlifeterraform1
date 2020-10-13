@@ -13,3 +13,6 @@ variable "web_server_address_space" {
 variable "web_server_address_prefix" {
     type = string
 }
+variable "admin_password" {
+    type = string
+}
