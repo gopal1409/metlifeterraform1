@@ -43,13 +43,13 @@ resource "azurerm_network_security_group" "myterraformnsg"{
     location = var.web_server_location
     resource_group_name = azurerm_resource_group.myterraform.name
     security_rule {
-        name = "RDP"
+        name = "HTTP"
         priority = 1001
         direction = "Inbound"
         access = "Allow"
         protocol = "TCP"
         source_port_range = "*"
-        destination_port_range = "3389"
+        destination_port_range = "80"
         source_address_prefix = "*"
         destination_address_prefix = "*"
     }
@@ -78,7 +78,9 @@ resource "azurerm_network_security_group" "myterraformnsg"{
     resource "azurerm_network_interface_security_group_association" "example" {
         network_interface_id = azurerm_network_interface.myterraformnic.id
         network_security_group_id = azurerm_network_security_group.myterraformnsg.id 
+    
     }
+    
 resource "random_id" "randomid" {
     keepers = {
         #generate new id only when a new resource group is defined"
