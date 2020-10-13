@@ -105,13 +105,13 @@ resource "azurerm_storage_account" "mystorageaccount" {
 
 
 resource "azurerm_windows_virtual_machine" "example" {
-  name = "${var.resource_prefix}-winvm"
+  name = "${var.resource_prefix}-vm"
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.myterraform.name
   network_interface_ids = [azurerm_network_interface.myterraformnic.id]
   size                = "Standard_DS1_V2"
   admin_username      = "gopal"
-  admin_password      = "Hetal@123456"
+  admin_password      = data.azurerm_key_vault_secret.admin_password.value
   
   os_disk {
     caching              = "ReadWrite"
