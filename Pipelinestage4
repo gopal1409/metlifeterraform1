@@ -1,0 +1,21 @@
+node{
+    stage('SCM Checkout'){
+        git 'https://github.com/javahometech/my-app'
+    }
+    stage('MVN Package'){
+        def mvnHome = tool name: 'localMaven', type: 'maven'
+        def mvnCMD = "${mvnHome}/bin/mvn"
+        sh "${mvnCMD} clean package"
+        
+    }
+    stage('Build Docker Image'){
+        
+        sh 'docker build -t gopal1409/mvnimage .'
+    }
+    stage('Push Docker Image'){
+        withCredentials([string(credentialsId: 'docker-txt', variable: 'dockerHubtxt')]) {
+    sh "docker login -u gopal1409 -p ${dockerHubtxt}"
+    }
+    sh 'docker push gopal1409/mvnimage'
+    }
+}
